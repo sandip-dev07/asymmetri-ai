@@ -5,6 +5,8 @@ import {
   primaryKey,
   uuid,
   integer,
+  jsonb,
+  index,
 } from "drizzle-orm/pg-core";
 
 // Users
@@ -65,4 +67,37 @@ export const verificationTokens = pgTable(
       columns: [vt.identifier, vt.token],
     }),
   }),
+);
+
+// Chat Sessions
+export const chatSessions = pgTable(
+  "chat_sessions",
+  {
+    id: uuid("id").defaultRandom().primaryKey().notNull(),
+    userId: uuid("user_id")
+      .notNull()
+      .references(() => users.id, { onDelete: "cascade" }),
+    title: text("title"),
+    createdAt: timestamp("created_at").defaultNow().notNull(),
+  },
+  (table) => [index("chat_sessions_user_idx").on(table.userId)],
+);
+
+// Messages
+export const messages = pgTable(
+  "messages",
+  {
+    id: uuid("id").defaultRandom().primaryKey().notNull(),
+    chatSessionId: uuid("chat_session_id")
+      .notNull()
+      .references(() => chatSessions.id, { onDelete: "cascade" }),
+    role: text("role").notNull(), // user | assistant | tool
+    content: text("content").notNull(),
+    toolName: text("tool_name"),
+    toolData: jsonb("tool_data"),
+    createdAt: timestamp("created_at").defaultNow().notNull(),
+  },
+  (msg) => [
+    index("messages_chat_session_idx").on(msg.chatSessionId),
+  ],
 );
