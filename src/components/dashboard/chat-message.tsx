@@ -1,56 +1,106 @@
+"use client";
+
+import type { UIMessage } from "ai";
+import { isTextUIPart } from "ai";
 import { Bot, User } from "lucide-react";
+
+import { useSession } from "next-auth/react";
+
 import WeatherCard from "./tool-cards/weather-card";
 import F1Card from "./tool-cards/f1-card";
 import StockCard from "./tool-cards/stock-card";
 
-interface ChatMessageProps {
-  message: unknown;
-}
+type ChatMessageProps = {
+  message: UIMessage;
+};
 
 const ChatMessage = ({ message }: ChatMessageProps) => {
+  const { data: session } = useSession();
   const isUser = message.role === "user";
 
+  let textContent = "";
+  const toolParts: typeof message.parts = [];
+
+  for (const part of message.parts) {
+    if (isTextUIPart(part)) {
+      textContent += part.text;
+    }
+
+    if (typeof part.type === "string" && part.type.startsWith("tool-")) {
+      toolParts.push(part);
+    }
+  }
+
   return (
-    <div
-      className={`flex gap-3 ${isUser ? "justify-end" : "justify-start"}`}
-    >
+    <div className={`flex gap-3 ${isUser ? "justify-end" : "justify-start"}`}>
       {!isUser && (
-        <div className="flex-0 w-8 h-8 rounded-lg bg-primary/20 flex items-center justify-center mt-1">
+        <div className="flex-0 min-w-8 h-8 rounded-full bg-primary/20 flex items-center justify-center">
           <Bot className="w-4 h-4 text-primary" />
         </div>
       )}
+
       <div
         className={`max-w-130 space-y-3 ${isUser ? "items-end" : "items-start"}`}
       >
-        <div
-          className={`rounded-2xl px-4 py-3 text-sm leading-relaxed`}
-        >
+        {textContent ? (
           <div
-            className="whitespace-pre-wrap bg-zinc-200 p-1 px-2 rounded-md"
-            dangerouslySetInnerHTML={{
-              __html: message.content
-                .replace(/\*\*(.*?)\*\*/g, "<strong>$1</strong>")
-                .replace(/• /g, "<br/>• "),
-            }}
-          />
-        </div>
-        {message.toolCall && (
-          <div className="mt-2">
-            {message.toolCall.type === "weather" && (
-              <WeatherCard data={message.toolCall.data as unknown} />
-            )}
-            {message.toolCall.type === "f1" && (
-              <F1Card data={message.toolCall.data as unknown} />
-            )}
-            {message.toolCall.type === "stock" && (
-              <StockCard data={message.toolCall.data as unknown} />
-            )}
+            className={`${
+              isUser
+                ? "rounded-l-2xl rounded-tr-none"
+                : "rounded-r-2xl rounded-tl-none"
+            } rounded-xl bg-zinc-200 px-4 py-1.5 text-sm leading-relaxed`}
+          >
+            <p className="whitespace-pre-wrap">{textContent}</p>
+          </div>
+        ) : null}
+
+        {toolParts.length > 0 && (
+          <div className="mt-2 space-y-2">
+            {toolParts.map((part, index) => {
+              if ((part as { state?: string }).state !== "output-available") {
+                return null;
+              }
+
+              if (part.type === "tool-getWeather") {
+                return (
+                  <WeatherCard
+                    key={`${message.id}-${index}`}
+                    data={(part as { output: unknown }).output}
+                  />
+                );
+              }
+
+              if (part.type === "tool-getF1Matches") {
+                return (
+                  <F1Card
+                    key={`${message.id}-${index}`}
+                    data={(part as { output: unknown }).output}
+                  />
+                );
+              }
+
+              if (part.type === "tool-getStockPrice") {
+                return (
+                  <StockCard
+                    key={`${message.id}-${index}`}
+                    data={(part as { output: unknown }).output}
+                  />
+                );
+              }
+
+              return null;
+            })}
           </div>
         )}
       </div>
+
       {isUser && (
-        <div className="flex-0 min-w-8 h-8 rounded-lg bg-primary/20 flex items-center justify-center mt-2">
-          <User className="w-4 h-4 text-primary" />
+        <div className="flex-0 min-w-8 h-8 rounded-full overflow-hidden bg-primary/20 flex items-center justify-center">
+          {session?.user?.image ? (
+            <img src={session?.user?.image} alt="" className="w-8 h-8" />
+          ) : (
+            <User className="w-4 h-4 text-primary" />
+          )}
         </div>
       )}
     </div>

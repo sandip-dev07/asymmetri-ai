@@ -38,12 +38,8 @@ export async function getStockPrice(symbol: string) {
     }
 
     const data = await res.json();
-    const quote = data["Global Quote"];
-
-    if (!quote || !quote["05. price"]) {
-      throw new Error("Invalid stock symbol or API limit reached");
-    }
-
+    const quote = data["Global Quote"]
+    
     return {
       symbol: quote["01. symbol"],
       price: quote["05. price"],
@@ -56,13 +52,33 @@ export async function getStockPrice(symbol: string) {
 
 export async function getF1Matches() {
   try {
-    const res = await fetch("https://ergast.com/api/f1/current/next.json");
+    const endpoints = [
+      "https://api.jolpi.ca/ergast/f1/current/next.json",
+    ];
 
-    if (!res.ok) {
-      throw new Error(`F1 api error: ${res.status}`);
+    let lastError: Error | null = null;
+    let data: any = null;
+
+    for (const endpoint of endpoints) {
+      try {
+        const res = await fetch(endpoint);
+
+        if (!res.ok) {
+          throw new Error(`F1 API error: ${res.status}`);
+        }
+
+        data = await res.json();
+        if (data) break;
+      } catch (error) {
+        lastError =
+          error instanceof Error ? error : new Error("Unknown fetch error");
+      }
     }
 
-    const data = await res.json();
+    if (!data) {
+      throw lastError ?? new Error("No F1 endpoint available");
+    }
+
     const race = data?.MRData?.RaceTable?.Races?.[0];
 
     if (!race) {
