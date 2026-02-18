@@ -53,7 +53,7 @@ export default function NewChat() {
           <button
             type="submit"
             disabled={isPending || !prompt.trim()}
-            className="absolute bottom-1 right-1 cursor-pointer disabled:opacity-60"
+            className="absolute bottom-1 right-4 cursor-pointer disabled:opacity-60"
           >
             <ArrowRight
               size={28}
