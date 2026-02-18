@@ -140,3 +140,26 @@
   background: #e9e9eb;
   border-radius: 9999px;
 }
+
+.shiny-loader-text {
+  color: transparent;
+  background: linear-gradient(
+    110deg,
+    rgb(113 113 122) 25%,
+    rgb(228 228 231) 50%,
+    rgb(113 113 122) 75%
+  );
+  background-size: 200% 100%;
+  background-clip: text;
+  -webkit-background-clip: text;
+  animation: shimmer 1.8s linear infinite;
+}
+
+@keyframes shimmer {
+  0% {
+    background-position: 200% 0;
+  }
+  100% {
+    background-position: -200% 0;
+  }
+}
