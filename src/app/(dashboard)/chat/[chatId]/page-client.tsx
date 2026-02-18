@@ -55,7 +55,7 @@ export default function ChatThread({
   }, [messages, status]);
 
   return (
-    <section className="w-full h-[87vh] flex flex-col gap-3">
+    <section className="w-full h-[87svh] flex flex-col gap-2">
       <div className="flex-1 h-full max-w-3xl mx-auto overflow-y-auto w-full space-y-4 rounded-xl p-4">
         {messages.map((message) => (
           <ChatMessage key={message.id} message={message} />

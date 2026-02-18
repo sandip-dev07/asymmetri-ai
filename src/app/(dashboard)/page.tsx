@@ -36,7 +36,7 @@ export default function NewChat() {
           How can I help you?
         </h2>
 
-        <form className="group w-full relative max-h-40" onSubmit={onSubmit}>
+        <form className="group w-full relative max-h-40 px-3" onSubmit={onSubmit}>
           <Textarea
             className="rounded-2xl max-h-40 w-full"
             placeholder="Ask me anything!"
