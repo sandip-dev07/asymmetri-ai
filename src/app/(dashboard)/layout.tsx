@@ -7,6 +7,7 @@ import {
   SidebarProvider,
   SidebarTrigger,
 } from "@/components/ui/sidebar";
+import { getUserChatSessions } from "@/server/actions/chat-actions";
 
 export default async function DashboardLayout({
   children,
@@ -14,10 +15,16 @@ export default async function DashboardLayout({
   children: React.ReactNode;
 }>) {
   const session = await auth();
-  if (!session) return redirect("/login");
+
+  if (!session) {
+    return redirect("/login");
+  }
+
+  const chats = await getUserChatSessions();
+
   return (
     <SidebarProvider>
-      <AppSidebar />
+      <AppSidebar chats={chats} />
       <SidebarInset>
         <header className="flex h-16 shrink-0 items-center gap-2">
           <div className="flex items-center gap-2 px-4">
