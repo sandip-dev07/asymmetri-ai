@@ -34,7 +34,7 @@ export default async function SignIn() {
 
           <div className="space-y-3 w-xs">
             <form action={handleGithubLogin}>
-              <Button type="submit" variant="default" className="w-full">
+              <Button type="submit" variant="outline" className="w-full">
                 <Github />
                 Sign in with GitHub
               </Button>

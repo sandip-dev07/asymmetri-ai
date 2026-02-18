@@ -62,7 +62,7 @@ const ChatMessage = ({ message }: ChatMessageProps) => {
               isUser
                 ? "rounded-l-2xl rounded-tr-none"
                 : "rounded-r-2xl rounded-tl-none"
-            } rounded-xl bg-zinc-200 px-4 py-1.5 text-sm leading-relaxed`}
+            } rounded-xl bg-zinc-200/70 px-4 py-1.5 text-sm leading-relaxed`}
           >
             <p className="whitespace-pre-wrap">{displayText}</p>
           </div>
