@@ -1,7 +1,7 @@
 "use client";
 
 import { useRouter } from "next/navigation";
-import { useTransition, useState } from "react";
+import { useState } from "react";
 import { ArrowRight } from "lucide-react";
 import { Textarea } from "@/components/ui/textarea";
 import { Button } from "@/components/ui/button";
@@ -12,21 +12,24 @@ const examplePrompts = ["Weather in Delhi", "Next F1 race", "AAPL stock price"];
 export default function NewChat() {
   const router = useRouter();
   const [prompt, setPrompt] = useState("");
-  const [isPending, startTransition] = useTransition();
+  const [isLoading, setIsLoading] = useState(false);
 
-  const startChat = (value: string) => {
+  const startChat = async (value: string) => {
     const cleanPrompt = value.trim();
-    if (!cleanPrompt) return;
+    if (!cleanPrompt || isLoading) return;
 
-    startTransition(async () => {
+    setIsLoading(true);
+    try {
       const chatId = await createChatSession(cleanPrompt);
       router.push(`/chat/${chatId}?q=${cleanPrompt}`);
-    });
+    } finally {
+      setIsLoading(false);
+    }
   };
 
-  const onSubmit = (event: React.FormEvent<HTMLFormElement>) => {
+  const onSubmit = async (event: React.FormEvent<HTMLFormElement>) => {
     event.preventDefault();
-    startChat(prompt);
+    await startChat(prompt);
   };
 
   return (
@@ -52,7 +55,7 @@ export default function NewChat() {
           />
           <button
             type="submit"
-            disabled={isPending || !prompt.trim()}
+            disabled={isLoading || !prompt.trim()}
             className="absolute bottom-1 right-4 cursor-pointer disabled:opacity-60"
           >
             <ArrowRight
@@ -70,7 +73,7 @@ export default function NewChat() {
               variant="outline"
               size="sm"
               className="shadow-none rounded-full"
-              disabled={isPending}
+              disabled={isLoading}
             >
               {q}
             </Button>
