@@ -76,7 +76,7 @@ export default function ChatThread({
       </div>
 
       <form
-        className="max-w-3xl w-full mx-auto relative bottom-0"
+        className="max-w-3xl w-full mx-auto relative bottom-0 px-3"
         onSubmit={(event) => {
           event.preventDefault();
           sendCurrentMessage();

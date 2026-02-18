@@ -10,7 +10,7 @@ export default function WeatherCard({ data }: { data: unknown }) {
   const weather = (data ?? {}) as WeatherData;
 
   return (
-    <Card className="gap-3 py-4">
+    <Card className="gap-3 py-4 bg-yellow-100 border-none">
       <CardHeader className="px-4">
         <CardTitle>Weather</CardTitle>
         <CardDescription>{weather.location || "Unknown location"}</CardDescription>

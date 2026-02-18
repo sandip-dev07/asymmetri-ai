@@ -11,7 +11,7 @@ export default function F1Card({ data }: { data: unknown }) {
   const race = (data ?? {}) as F1Data;
 
   return (
-    <Card className="gap-3 py-4">
+    <Card className="gap-3 py-4 bg-red-200 border-none">
       <CardHeader className="px-4">
         <CardTitle>Next F1 Race</CardTitle>
         <CardDescription>{race.raceName || "Unknown race"}</CardDescription>

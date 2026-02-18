@@ -19,7 +19,8 @@ const ChatMessage = ({ message }: ChatMessageProps) => {
   const isUser = message.role === "user";
 
   let textContent = "";
-  const toolParts: typeof message.parts = [];
+  const toolParts = [];
+  let hasToolError = false;
 
   for (const part of message.parts) {
     if (isTextUIPart(part)) {
@@ -28,8 +29,21 @@ const ChatMessage = ({ message }: ChatMessageProps) => {
 
     if (typeof part.type === "string" && part.type.startsWith("tool-")) {
       toolParts.push(part);
+
+      if ((part as { state?: string }).state === "output-error") {
+        hasToolError = true;
+      }
+    }
+
+    if (part.type === "dynamic-tool") {
+      if ((part as { state?: string }).state === "output-error") {
+        hasToolError = true;
+      }
     }
   }
+
+  const displayText =
+    !isUser && hasToolError ? "Something went wrong, try again!" : textContent;
 
   return (
     <div className={`flex gap-3 ${isUser ? "justify-end" : "justify-start"}`}>
@@ -40,9 +54,9 @@ const ChatMessage = ({ message }: ChatMessageProps) => {
       )}
 
       <div
-        className={`max-w-130 space-y-3 ${isUser ? "items-end" : "items-start"}`}
+        className={`md:max-w-130 space-y-3 ${isUser ? "items-end" : "items-start"}`}
       >
-        {textContent ? (
+        {displayText ? (
           <div
             className={`${
               isUser
@@ -50,7 +64,7 @@ const ChatMessage = ({ message }: ChatMessageProps) => {
                 : "rounded-r-2xl rounded-tl-none"
             } rounded-xl bg-zinc-200 px-4 py-1.5 text-sm leading-relaxed`}
           >
-            <p className="whitespace-pre-wrap">{textContent}</p>
+            <p className="whitespace-pre-wrap">{displayText}</p>
           </div>
         ) : null}
 
